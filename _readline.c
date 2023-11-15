@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
-* read_line - Reads a line from the prompt.
+* _getline - Reads a line from the prompt.
 * @shell_data: struct for the program's data
 *
 * Return: number of bytes read.
