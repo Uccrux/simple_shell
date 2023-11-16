@@ -41,9 +41,7 @@ int builtin_env(data_of_program *data)
 			}
 			cpname[i] = data->tokens[1][i];
 		}
-		errno = 2;
-		perror(data->command_name);
-		errno = 127;
+
 	}
 	return (0);
 }
