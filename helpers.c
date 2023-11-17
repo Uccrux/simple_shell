@@ -11,7 +11,7 @@
  */
 void print_env(void)
 {
-	extern char **environ;
+	char **environ;
 	int itr = 0;
 
 	while (environ[itr] != NULL)

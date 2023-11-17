@@ -58,14 +58,7 @@ void run_cmd(char *input)
 				itr++;
 			}
 			argv[itr] = NULL;
-			/*
-			if (_strcmp(argv[0], "exit") == 0)
-			{
-				exit_cmd();
-				return;
-			}
-			*/
-			/*Handle logical operators*/
+
 			if (itr > 0)
 			{
 				if (_strcmp(argv[0], "&&") == 0)
