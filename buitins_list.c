@@ -27,7 +27,7 @@ int builtins_list(data_of_program *data)
 		if (str_compare(options[iterator].builtin, data->command_name, 0))
 		{
 /*execute the function, and return the return value of the function*/
-			return (options[iterator].function(shell data));
+			return (options[iterator].function(data));
 		}
 /*if there is no match return -1 */
 	}
