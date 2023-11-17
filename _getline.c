@@ -1,96 +1,66 @@
 #include "shell.h"
 
 /**
-* _getline - read one line from the prompt.
-* @data: struct for the program's data
-*
-* Return: reading counting bytes.
-*/
-int _getline(data_of_program *data)
+ * _getline- user-defined getline function reads input from a file
+ * stream and stores in a dynamically allocated buffer (segment in
+ * memory).
+ *
+ * @stor_str: pointer to pointer where array of char (string) will
+ * be stored. Its a memory location.
+ *
+ * @stor_siz:pointer representing size of memory where characters
+ * will be stored. Keeps track of allocated memory and can resize
+ * depending on operations.
+ *
+ * @stream: pointer to input which is to be read (File Structure).
+ *
+ * Return:No of char read or NULL.
+ *
+ */
+ssize_t _getline(char **stor_str, size_t *stor_siz, FILE *stream);
+
+ssize_t _getline(char **stor_str, size_t *stor_siz, FILE *stream)
 {
-	char buff[BUFFER_SIZE] = {'\0'};
-	static char *array_commands[10] = {NULL};
-	static char array_operators[10] = {'\0'};
-	ssize_t bytes_read, i = 0;
+	char *buffer = *stor_str;
+	size_t no_char = 0;
+	int ch;
 
-	/* check if doesnot exist more commands in the array */
-	/* and checks the logical operators */
-	if (!array_commands[0] || (array_operators[0] == '&' && errno != 0) ||
-		(array_operators[0] == '|' && errno == 0))
+	if (*stor_str == NULL)
 	{
-		/*free the memory allocated in the array if it exists */
-		for (i = 0; array_commands[i]; i++)
-		{
-			free(array_commands[i]);
-			array_commands[i] = NULL;
-		}
+		*stor_siz = 128;/*Initial buffer size*/
+		*stor_str = (char *)malloc(*stor_siz);
 
-		/* read from the file descriptor int to buff */
-		bytes_read = read(data->file_descriptor, &buff, BUFFER_SIZE - 1);
-		if (bytes_read == 0)
-			return (-1);
-
-		/* split lines for \n or ; */
-		i = 0;
-		do {
-			array_commands[i] = str_duplicate(_strtok(i ? NULL : buff, "\n;"));
-			/*checks and split for && and || operators*/
-			i = check_logic_ops(array_commands, i, array_operators);
-		} while (array_commands[i++]);
+		if (*stor_str == NULL)
+			return (-1);/*Memory allocation failed*/
 	}
 
-	/*obtains the next command (command 0) and remove it for the array*/
-	data->input_line = array_commands[0];
-	for (i = 0; array_commands[i]; i++)
+	while (1)
 	{
-		array_commands[i] = array_commands[i + 1];
-		array_operators[i] = array_operators[i + 1];
-	}
+		ch = fgetc(stream);
 
-	return (str_length(data->input_line));
-}
-
-
-/**
-* check_logic_ops - checks and split for && and || operators
-* @array_commands: array of the commands.
-* @i: index in the array_commands to be checked
-* @array_operators: array of the logical operators for each previous command
-*
-* Return: index of the last command in the array_commands.
-*/
-int check_logic_ops(char *array_commands[], int i, char array_operators[])
-{
-	char *temp = NULL;
-	int j;
-
-	/* checks for the & char in the command line*/
-	for (j = 0; array_commands[i] != NULL  && array_commands[i][j]; j++)
-	{
-		if (array_commands[i][j] == '&' && array_commands[i][j + 1] == '&')
+		if (ch == EOF)
 		{
-			/* split the line when chars && was found */
-			temp = array_commands[i];
-			array_commands[i][j] = '\0';
-			array_commands[i] = str_duplicate(array_commands[i]);
-			array_commands[i + 1] = str_duplicate(temp + j + 2);
-			i++;
-			array_operators[i] = '&';
-			free(temp);
-			j = 0;
+			if (no_char == 0)
+				return (-1);/*No data read, and we've reached the end of the file*/
+			buffer[no_char] = '\0';
+			return (no_char);/*Return the number of characters read*/
 		}
-		if (array_commands[i][j] == '|' && array_commands[i][j + 1] == '|')
+		if (ch == '\n')
 		{
-			/* split the line when chars || was found */
-			temp = array_commands[i];
-			array_commands[i][j] = '\0';
-			array_commands[i] = str_duplicate(array_commands[i]);
-			array_commands[i + 1] = str_duplicate(temp + j + 2);
-			i++;
-			array_operators[i] = '|';
-			free(temp);
-			j = 0;
+			buffer[no_char] = '\0';
+			return (no_char);/*Return the number of characters read*/
+		}
+		buffer[no_char] = (char)ch;
+		no_char++;
+		if (no_char >= *stor_siz)
+		{
+			/*Resize the buffer when it's full*/
+			*stor_siz *= 2;
+			*stor_str = (char *)realloc(*stor_str, *stor_siz);
+
+			if (*stor_str == NULL)
+				return (-1);/*Memory allocation failed*/
+			buffer = *stor_str + no_char;/*Update the buffer pointer*/
 		}
 	}
-	return (i);
 }

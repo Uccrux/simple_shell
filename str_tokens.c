@@ -1,42 +1,30 @@
-#include "shell.h"
-/**
- * _strtok - separates strings with delimiters
- * @line: It´s pointer to array we receive in getline.
- * @delim: It´s characters we mark off string in parts.
- * Return: A pointer to the created token
-*/
-char *_strtok(char *line, char *delim)
-{
-	int j;
-	static char *str;
-	char *copystr;
+# include "shell.h"
 
-	if (line != NULL)
-		str = line;
-	for (; *str != '\0'; str++)
+/**
+ * _strcmp - Compares difference of two strings until find
+ * the difference or reaches the end of both strings.
+ *
+ * @str_1: Pointer to 1st string.
+ * @str_2: Pointer to 2nd string
+ *
+ * Return: 0 if both strings are equal or a positive or negative
+ * value based on the difference.
+ *
+ */
+
+int _strcmp(const char *str_1, char const *str_2)
+{
+	while (*str_1 != '\0' && *str_2 != '\0')
 	{
-		for (j = 0; delim[j] != '\0'; j++)
-		{
-			if (*str == delim[j])
-			break;
-		}
-		if (delim[j] == '\0')
-			break;
+		if (*str_1 != *str_2)
+			return (*str_1 - *str_2);
+		str_1++;
+		str_2++;
 	}
-	copystr = str;
-	if (*copystr == '\0')
-		return (NULL);
-	for (; *str != '\0'; str++)
-	{
-		for (j = 0; delim[j] != '\0'; j++)
-		{
-			if (*str == delim[j])
-			{
-				*str = '\0';
-				str++;
-				return (copystr);
-			}
-		}
-	}
-	return (copystr);
+	if (*str_1 != '\0')
+		return (1);
+	else if (*str_2 != '\0')
+		return (-1);
+
+	return (0);
 }
